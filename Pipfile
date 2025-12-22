@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+dill = ">=0.3.1.1"
+hyperopt = "*"
+joblib = ">=0.14.1"
+matplotlib = ">=2.2.0"
+numpy = ">=1.21.1"
+scikit-learn = ">=0.24.2"
+scipy = ">=1.4.1"
+tqdm = ">=4.43.0"
+
+[dev-packages]
+build = "*"
+pytest = "*"
+pytest-coverage = "*"
+pydata-sphinx-theme = "*"
+sphinx-panels = "*"
+Sphinx = "*"
+sphinx-autobuild = "*"
+twine = "*"
+
+[requires]
+python_version = "3.8"
+
+[packages.e1839a8]
+path = "."
+editable = true
