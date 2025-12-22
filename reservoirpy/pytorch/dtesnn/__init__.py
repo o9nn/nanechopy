@@ -90,6 +90,8 @@ from .jsurface_esn import (
     JMatrix,
 )
 from .model import DTESNN, DTESNNConfig, DTESNNEnsemble
+from .chatbot import DTESNNChatbot, ChatbotConfig, Vocabulary
+from .persistence import save_chatbot, load_chatbot, get_model_info
 
 __all__ = [
     # Main Model
@@ -115,4 +117,12 @@ __all__ = [
     "ElementaryDifferential",
     "ElementaryDifferentialNode",
     "JMatrix",
+    # Chatbot
+    "DTESNNChatbot",
+    "ChatbotConfig",
+    "Vocabulary",
+    # Persistence
+    "save_chatbot",
+    "load_chatbot",
+    "get_model_info",
 ]
