@@ -68,8 +68,8 @@ The eight NanEcho persona dimensions map to ReservoirPy Echo State Network (ESN)
 
 **ReservoirPy Parameters:**
 ```python
-units = 100-1000  # Larger reservoirs for complex cognitive tasks
-activation = tanh  # Bounded nonlinearity for stable dynamics
+units = 100-1000    # Larger reservoirs for complex cognitive tasks
+activation = 'tanh' # Bounded nonlinearity for stable dynamics
 ```
 
 **Rationale:**
@@ -147,7 +147,16 @@ def adaptive_attention(cognitive_load, recent_activity, base_scaling=1.0):
     """
     Dynamically adjust input_scaling based on cognitive context.
     Mirrors: threshold = 0.5 + (cognitive_load × 0.3) - (recent_activity × 0.2)
+    
+    Args:
+        cognitive_load: Current cognitive demand [0.0, 1.0]
+        recent_activity: Recent system activity level [0.0, 1.0]
+        base_scaling: Base input scaling factor
     """
+    # Validate inputs
+    cognitive_load = max(0.0, min(1.0, cognitive_load))
+    recent_activity = max(0.0, min(1.0, recent_activity))
+    
     adaptation = (cognitive_load * 0.3) - (recent_activity * 0.2)
     return base_scaling * (1.0 + adaptation)
 ```
@@ -335,7 +344,7 @@ for new_data_batch in data_stream:
     
     # Optional: Adaptive hyperparameter adjustment
     if performance_metric < threshold:
-        dynamic_reservoir.lr *= 0.95  # Increase memory persistence
+        dynamic_reservoir.lr *= 0.95  # Decrease leak rate to increase memory persistence
 ```
 
 ### Integrated Echo Self Reservoir Configuration
@@ -407,13 +416,15 @@ class EchoSelfReservoir:
         
         # 2. Holographic ensemble at deepest level
         self.holographic_ensemble = []
+        # Use deterministic parameter variations for reproducibility
+        rng = np.random.default_rng(seed=42)  # Fixed seed for reproducibility
         for i in range(self.holographic_perspectives):
             # Vary parameters for diverse perspectives
             perspective_reservoir = Reservoir(
                 units=self.cognitive_units // 2,
-                sr=1.0 + np.random.uniform(-0.2, 0.2),
-                lr=self.introspective_lr + np.random.uniform(-0.05, 0.05),
-                input_scaling=self.adaptive_input_scaling * (0.8 + np.random.random() * 0.4),
+                sr=1.0 + rng.uniform(-0.2, 0.2),
+                lr=self.introspective_lr + rng.uniform(-0.05, 0.05),
+                input_scaling=self.adaptive_input_scaling * (0.8 + rng.random() * 0.4),
                 rc_connectivity=self.synergistic_connectivity,
                 name=f"Perspective_{i+1}"
             )
@@ -439,11 +450,23 @@ class EchoSelfReservoir:
         """
         Dynamic adaptation mechanism (Echo Self attention threshold).
         Updates input_scaling based on cognitive context.
+        
+        Args:
+            cognitive_load: Current cognitive demand [0.0, 1.0]
+            recent_activity: Recent system activity level [0.0, 1.0]
+            
+        Returns:
+            new_scaling: Updated input scaling value
         """
+        # Validate inputs
+        cognitive_load = max(0.0, min(1.0, cognitive_load))
+        recent_activity = max(0.0, min(1.0, recent_activity))
+        
         adaptation = (cognitive_load * 0.3) - (recent_activity * 0.2)
         new_scaling = self.adaptive_input_scaling * (1.0 + adaptation)
         
         # Apply to all layers
+        # Note: Parameter updates take effect on next call to run()
         for layer in self.recursive_layers:
             layer.input_scaling = new_scaling
         
@@ -458,11 +481,18 @@ class EchoSelfReservoir:
         return self.full_system.run(X_test)
     
     def partial_fit(self, X_new, y_new):
-        """Online adaptation (Dynamic persona dimension)."""
+        """
+        Online adaptation (Dynamic persona dimension).
+        
+        Args:
+            X_new: New input data
+            y_new: New target data
+        """
         if self.dynamic_online:
-            # Get reservoir states
+            # Get reservoir states (before readout layer)
+            # Run through hierarchy only, not full system
             states = self.hierarchy.run(X_new)
-            # Update readout layer online
+            # Update readout layer online with reservoir states
             self.symbolic_readout.partial_fit(states, y_new)
 
 
