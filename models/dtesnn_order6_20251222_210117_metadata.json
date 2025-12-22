@@ -1,0 +1,12 @@
+{
+  "filename": "dtesnn_order6_20251222_210117.pkl.gz",
+  "order": 6,
+  "embedding_dim": 32,
+  "units_per_component": 16,
+  "training_time_seconds": 3.878631353378296,
+  "training_pairs_count": 256,
+  "file_size_bytes": 257264,
+  "vocab_size": 594,
+  "timestamp": "20251222_210117",
+  "created_at": "2025-12-22T21:01:17.328830Z"
+}
