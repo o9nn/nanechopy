@@ -1,0 +1,2 @@
+# This directory stores trained DTESNN chatbot models
+# Models are named: dtesnn_order{N}_{YYYYMMDD_HHMMSS}.pkl.gz

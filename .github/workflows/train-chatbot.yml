@@ -1,0 +1,127 @@
+name: Train DTESNN Chatbot
+
+on:
+  workflow_dispatch:
+    inputs:
+      order:
+        description: 'A000081 Order for the model (6-8 recommended, 9+ requires significant resources)'
+        required: true
+        default: '6'
+        type: choice
+        options:
+          - '3'
+          - '4'
+          - '5'
+          - '6'
+          - '7'
+          - '8'
+      embedding_dim:
+        description: 'Embedding dimension (lower for higher orders)'
+        required: true
+        default: '32'
+        type: choice
+        options:
+          - '16'
+          - '24'
+          - '32'
+          - '48'
+          - '64'
+      units_per_component:
+        description: 'Units per component (lower for higher orders)'
+        required: true
+        default: '16'
+        type: choice
+        options:
+          - '8'
+          - '12'
+          - '16'
+          - '24'
+          - '32'
+      custom_training_pairs:
+        description: 'Additional training pairs (JSON format, optional)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy scipy torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e .
+      
+      - name: Create models directory
+        run: mkdir -p models
+      
+      - name: Train and save model
+        id: train
+        env:
+          ORDER: ${{ github.event.inputs.order }}
+          EMBEDDING_DIM: ${{ github.event.inputs.embedding_dim }}
+          UNITS_PER_COMPONENT: ${{ github.event.inputs.units_per_component }}
+          CUSTOM_TRAINING_PAIRS: ${{ github.event.inputs.custom_training_pairs }}
+        run: |
+          python scripts/train_and_save.py
+          
+          # Get the output filename
+          FILENAME=$(ls -t models/*.pkl.gz 2>/dev/null | head -1)
+          echo "model_file=$FILENAME" >> $GITHUB_OUTPUT
+          echo "Trained model saved to: $FILENAME"
+      
+      - name: Commit and push model
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add models/
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Add trained DTESNN chatbot model (order ${{ github.event.inputs.order }})
+            
+            - Order: ${{ github.event.inputs.order }}
+            - Embedding dim: ${{ github.event.inputs.embedding_dim }}
+            - Units per component: ${{ github.event.inputs.units_per_component }}
+            - Trained at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            
+            git push
+          fi
+      
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dtesnn-chatbot-order-${{ github.event.inputs.order }}
+          path: ${{ steps.train.outputs.model_file }}
+          retention-days: 30
+      
+      - name: Summary
+        run: |
+          echo "## DTESNN Chatbot Training Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- **Order:** ${{ github.event.inputs.order }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Embedding Dimension:** ${{ github.event.inputs.embedding_dim }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Units per Component:** ${{ github.event.inputs.units_per_component }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Model File" >> $GITHUB_STEP_SUMMARY
+          echo "The trained model has been saved to the \`models/\` directory and is available as a workflow artifact." >> $GITHUB_STEP_SUMMARY
