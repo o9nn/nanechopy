@@ -92,6 +92,16 @@ from .jsurface_esn import (
 from .model import DTESNN, DTESNNConfig, DTESNNEnsemble
 from .chatbot import DTESNNChatbot, ChatbotConfig, Vocabulary
 from .persistence import save_chatbot, load_chatbot, get_model_info
+from .export import (
+    export_json,
+    export_pickle,
+    export_numpy,
+    export_config_json,
+    export_onnx,
+    export_gguf,
+    export_scheme,
+    export_all_formats,
+)
 
 __all__ = [
     # Main Model
@@ -125,4 +135,13 @@ __all__ = [
     "save_chatbot",
     "load_chatbot",
     "get_model_info",
+    # Export
+    "export_json",
+    "export_pickle",
+    "export_numpy",
+    "export_config_json",
+    "export_onnx",
+    "export_gguf",
+    "export_scheme",
+    "export_all_formats",
 ]

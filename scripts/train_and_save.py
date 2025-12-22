@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """
-Train and save DTESNN chatbot model.
+Train and save DTESNN chatbot model in multiple formats.
 
 This script is designed to be run by the GitHub Action workflow.
 It reads configuration from environment variables and saves the trained
-model to a timestamped file in the models/ directory.
+model to multiple formats in the models/ directory.
 
-The script loads training data from data/training_dataset.jsonl if available.
+Supported export formats:
+- JSON (.json): Complete Python dictionary as JSON
+- Pickle (.pkl.gz): Compressed Python object serialization
+- NumPy (.npz): Compressed numpy arrays
+- Config JSON (.config.json): Configuration and metadata only
+- ONNX (.onnx): Open Neural Network Exchange format
+- GGUF (.gguf): GPT-Generated Unified Format
+- Guile Scheme (.scm): S-expression format
 
 Environment Variables:
     ORDER: A000081 order for the model (default: 6)
@@ -14,11 +21,13 @@ Environment Variables:
     UNITS_PER_COMPONENT: Units per component (default: 16)
     CUSTOM_TRAINING_PAIRS: JSON string of additional training pairs (optional)
     TRAINING_DATA_PATH: Path to training data JSONL file (default: data/training_dataset.jsonl)
+    EXPORT_FORMATS: Comma-separated list of formats to export (default: all)
 """
 
 import os
 import sys
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -31,6 +40,7 @@ sys.path.insert(0, os.path.join(repo_dir, 'reservoirpy', 'pytorch', 'autognosis'
 
 from chatbot import DTESNNChatbot, ChatbotConfig
 from persistence import save_chatbot, get_model_info
+from export import export_all_formats
 
 
 def load_training_data(filepath: str) -> list:
@@ -60,7 +70,6 @@ def load_training_data(filepath: str) -> list:
                     
                     if user_msg and asst_msg:
                         # Clean up the messages - extract key content
-                        # Remove markdown formatting and code blocks
                         user_text = clean_message(user_msg)
                         asst_text = clean_message(asst_msg)
                         
@@ -76,8 +85,6 @@ def load_training_data(filepath: str) -> list:
 
 def clean_message(text: str) -> str:
     """Clean message text for training."""
-    import re
-    
     # Remove markdown code blocks
     text = re.sub(r'```[\s\S]*?```', '', text)
     text = re.sub(r'`[^`]+`', '', text)
@@ -107,14 +114,16 @@ def main():
     units_per_component = int(os.environ.get('UNITS_PER_COMPONENT', '16'))
     custom_pairs_json = os.environ.get('CUSTOM_TRAINING_PAIRS', '')
     training_data_path = os.environ.get('TRAINING_DATA_PATH', 'data/training_dataset.jsonl')
+    export_formats = os.environ.get('EXPORT_FORMATS', 'all')
     
     print("=" * 60)
-    print("DTESNN Chatbot Training")
+    print("DTESNN Chatbot Training & Multi-Format Export")
     print("=" * 60)
     print(f"Order: {order}")
     print(f"Embedding Dimension: {embedding_dim}")
     print(f"Units per Component: {units_per_component}")
     print(f"Training Data Path: {training_data_path}")
+    print(f"Export Formats: {export_formats}")
     
     # Load training data from file
     training_pairs = []
@@ -130,7 +139,6 @@ def main():
         try:
             custom_pairs = json.loads(custom_pairs_json)
             if isinstance(custom_pairs, list):
-                # Convert to list of tuples if it's a list of lists
                 if len(custom_pairs) > 0 and isinstance(custom_pairs[0], list):
                     custom_pairs = [tuple(pair) for pair in custom_pairs]
                 training_pairs.extend(custom_pairs)
@@ -185,53 +193,78 @@ def main():
         response = chatbot.respond(test_input)
         print(f"  '{test_input}': {response[:80]}...")
     
-    # Generate timestamped filename
+    # Generate timestamped base filename
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    filename = f"models/dtesnn_order{order}_{timestamp}.pkl.gz"
+    base_filename = f"models/dtesnn_order{order}_{timestamp}"
     
     # Ensure models directory exists
     os.makedirs("models", exist_ok=True)
     
-    # Save the model
-    print(f"\nSaving model to {filename}...")
-    saved_path = save_chatbot(chatbot, filename, compress=True)
-    
-    # Verify the saved model
-    file_size = os.path.getsize(saved_path)
-    print(f"Model saved successfully!")
-    print(f"  File: {saved_path}")
-    print(f"  Size: {file_size / 1024:.2f} KB")
-    
-    # Get and display model info
-    info = get_model_info(saved_path)
-    print(f"  Version: {info.get('version')}")
-    print(f"  Vocab Size: {info.get('vocab_size')}")
-    print(f"  Is Trained: {info.get('is_trained')}")
-    
-    # Create a metadata file
-    metadata = {
-        "filename": os.path.basename(saved_path),
-        "order": order,
-        "embedding_dim": embedding_dim,
-        "units_per_component": units_per_component,
-        "training_time_seconds": training_time,
-        "training_pairs_count": len(training_pairs),
-        "file_size_bytes": file_size,
-        "vocab_size": info.get('vocab_size'),
-        "timestamp": timestamp,
-        "created_at": datetime.utcnow().isoformat() + "Z",
-    }
-    
-    metadata_file = saved_path.replace('.pkl.gz', '_metadata.json')
-    with open(metadata_file, 'w') as f:
-        json.dump(metadata, f, indent=2)
-    print(f"  Metadata: {metadata_file}")
-    
+    # Export to all formats
     print("\n" + "=" * 60)
-    print("Training Complete!")
+    print("Exporting to Multiple Formats")
     print("=" * 60)
     
-    return saved_path
+    export_paths = export_all_formats(chatbot, base_filename)
+    
+    # Calculate total size
+    total_size = 0
+    for fmt, path in export_paths.items():
+        if os.path.exists(path):
+            size = os.path.getsize(path)
+            total_size += size
+            print(f"  {fmt}: {path} ({size / 1024:.2f} KB)")
+    
+    print(f"\nTotal export size: {total_size / 1024:.2f} KB")
+    
+    # Create comprehensive metadata file
+    metadata = {
+        "model_name": f"dtesnn_order{order}",
+        "timestamp": timestamp,
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        
+        "configuration": {
+            "order": order,
+            "embedding_dim": embedding_dim,
+            "units_per_component": units_per_component,
+            "temperature": config.temperature,
+            "top_k": config.top_k,
+        },
+        
+        "training": {
+            "training_time_seconds": training_time,
+            "training_pairs_count": len(training_pairs),
+            "training_data_path": training_data_path,
+        },
+        
+        "model_stats": {
+            "vocab_size": len(chatbot.vocab.words),
+            "total_trees": chatbot.model.synchronizer.params.total_trees if chatbot.model.synchronizer else 0,
+            "tree_counts": chatbot.model.synchronizer.params.tree_counts if chatbot.model.synchronizer else [],
+        },
+        
+        "exports": {
+            fmt: {
+                "path": path,
+                "size_bytes": os.path.getsize(path) if os.path.exists(path) else 0,
+            }
+            for fmt, path in export_paths.items()
+        },
+        
+        "total_size_bytes": total_size,
+    }
+    
+    metadata_file = f"{base_filename}_metadata.json"
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"\nMetadata saved to: {metadata_file}")
+    
+    print("\n" + "=" * 60)
+    print("Training & Export Complete!")
+    print("=" * 60)
+    
+    # Return the primary pkl.gz path for backward compatibility
+    return export_paths.get('pkl', f"{base_filename}.pkl.gz")
 
 
 if __name__ == "__main__":
