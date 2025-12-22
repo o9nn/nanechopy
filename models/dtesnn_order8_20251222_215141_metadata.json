@@ -1,0 +1,62 @@
+{
+  "model_name": "dtesnn_order8",
+  "timestamp": "20251222_215141",
+  "created_at": "2025-12-22T21:51:41.442148Z",
+  "configuration": {
+    "order": 8,
+    "embedding_dim": 16,
+    "units_per_component": 8,
+    "temperature": 0.8,
+    "top_k": 50
+  },
+  "training": {
+    "training_time_seconds": 266.5228147506714,
+    "training_pairs_count": 256,
+    "training_data_path": "data/training_dataset.jsonl"
+  },
+  "model_stats": {
+    "vocab_size": 594,
+    "total_trees": 203,
+    "tree_counts": [
+      1,
+      1,
+      2,
+      4,
+      9,
+      20,
+      48,
+      115
+    ]
+  },
+  "exports": {
+    "json": {
+      "path": "models/dtesnn_order8_20251222_215141.json",
+      "size_bytes": 639019
+    },
+    "pkl": {
+      "path": "models/dtesnn_order8_20251222_215141.pkl.gz",
+      "size_bytes": 179217
+    },
+    "npz": {
+      "path": "models/dtesnn_order8_20251222_215141.npz",
+      "size_bytes": 75218
+    },
+    "config": {
+      "path": "models/dtesnn_order8_20251222_215141.config.json",
+      "size_bytes": 1492
+    },
+    "onnx": {
+      "path": "models/dtesnn_order8_20251222_215141.onnx.json",
+      "size_bytes": 51580
+    },
+    "gguf": {
+      "path": "models/dtesnn_order8_20251222_215141.gguf",
+      "size_bytes": 38464
+    },
+    "scm": {
+      "path": "models/dtesnn_order8_20251222_215141.scm",
+      "size_bytes": 3251
+    }
+  },
+  "total_size_bytes": 988241
+}

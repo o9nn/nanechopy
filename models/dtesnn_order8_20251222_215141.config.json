@@ -1,0 +1,74 @@
+{
+  "version": "1.0",
+  "format": "dtesnn_config",
+  "exported_at": "2025-12-22T21:51:41.427046Z",
+  "chatbot_config": {
+    "base_order": 8,
+    "embedding_dim": 16,
+    "units_per_component": 8,
+    "max_response_length": 50,
+    "temperature": 0.8,
+    "top_k": 50,
+    "warmup_steps": 10,
+    "seed": 42
+  },
+  "model_config": {
+    "base_order": 8,
+    "units_per_component": 8,
+    "total_units": null,
+    "leak_rate": 0.3,
+    "spectral_radius": 0.9,
+    "density": 0.1,
+    "ridge": 1e-06,
+    "communication_strength": 0.1,
+    "use_symplectic": true,
+    "use_hierarchical_ridge": true,
+    "aggregation": "weighted_sum",
+    "synchronize_weights": true
+  },
+  "vocabulary": {
+    "size": 594,
+    "embedding_dim": 16,
+    "special_tokens": [
+      "<PAD>",
+      "<UNK>",
+      "<START>",
+      "<END>",
+      "<SEP>"
+    ]
+  },
+  "synchronizer": {
+    "base_order": 8,
+    "tree_counts": [
+      1,
+      1,
+      2,
+      4,
+      9,
+      20,
+      48,
+      115
+    ],
+    "total_trees": 203
+  },
+  "dimensions": {
+    "input_dim": 16,
+    "output_dim": 594,
+    "jsurface_dim": 1624,
+    "reservoir_dim": 1632,
+    "combined_dim": 3256
+  },
+  "training": {
+    "is_trained": true,
+    "num_training_pairs": 288
+  },
+  "architecture": {
+    "type": "DTESNN",
+    "components": [
+      "JSurface ESN (Elementary Differentials)",
+      "Membrane Reservoir (P-System)",
+      "Ridge Tree (B-Series Readout)"
+    ],
+    "synchronization": "A000081 (Rooted Tree Enumeration)"
+  }
+}
