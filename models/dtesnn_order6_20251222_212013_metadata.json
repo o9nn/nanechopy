@@ -1,0 +1,60 @@
+{
+  "model_name": "dtesnn_order6",
+  "timestamp": "20251222_212013",
+  "created_at": "2025-12-22T21:20:13.427458Z",
+  "configuration": {
+    "order": 6,
+    "embedding_dim": 32,
+    "units_per_component": 16,
+    "temperature": 0.8,
+    "top_k": 50
+  },
+  "training": {
+    "training_time_seconds": 4.096600532531738,
+    "training_pairs_count": 256,
+    "training_data_path": "data/training_dataset.jsonl"
+  },
+  "model_stats": {
+    "vocab_size": 594,
+    "total_trees": 37,
+    "tree_counts": [
+      1,
+      1,
+      2,
+      4,
+      9,
+      20
+    ]
+  },
+  "exports": {
+    "json": {
+      "path": "models/dtesnn_order6_20251222_212013.json",
+      "size_bytes": 898341
+    },
+    "pkl": {
+      "path": "models/dtesnn_order6_20251222_212013.pkl.gz",
+      "size_bytes": 252751
+    },
+    "npz": {
+      "path": "models/dtesnn_order6_20251222_212013.npz",
+      "size_bytes": 148026
+    },
+    "config": {
+      "path": "models/dtesnn_order6_20251222_212013.config.json",
+      "size_bytes": 1470
+    },
+    "onnx": {
+      "path": "models/dtesnn_order6_20251222_212013.onnx.json",
+      "size_bytes": 102268
+    },
+    "gguf": {
+      "path": "models/dtesnn_order6_20251222_212013.gguf",
+      "size_bytes": 76480
+    },
+    "scm": {
+      "path": "models/dtesnn_order6_20251222_212013.scm",
+      "size_bytes": 3237
+    }
+  },
+  "total_size_bytes": 1482573
+}
