@@ -30,6 +30,15 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     Tensor = Any
+    class _TorchPlaceholder:
+        dtype = Any
+        Generator = Any
+        float32 = Any
+        float64 = Any
+        tanh = None
+        relu = None
+        sigmoid = None
+    torch = _TorchPlaceholder()
 
 from ..node import (
     TorchNode, TorchTrainableNode, TorchOnlineNode, TorchParallelNode,
