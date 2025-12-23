@@ -102,6 +102,15 @@ from .export import (
     export_scheme,
     export_all_formats,
 )
+from .orchestra import (
+    AutonomousOrchestra,
+    OrchestraConfig,
+    PersonaConfig,
+    CognitiveStyle,
+    AffectiveBaseline,
+    MemoryHook,
+    RelevanceRealizationConfig,
+)
 
 __all__ = [
     # Main Model
@@ -144,4 +153,12 @@ __all__ = [
     "export_gguf",
     "export_scheme",
     "export_all_formats",
+    # Orchestra
+    "AutonomousOrchestra",
+    "OrchestraConfig",
+    "PersonaConfig",
+    "CognitiveStyle",
+    "AffectiveBaseline",
+    "MemoryHook",
+    "RelevanceRealizationConfig",
 ]
