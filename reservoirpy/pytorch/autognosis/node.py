@@ -22,6 +22,9 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     Tensor = Any
+    class _TorchPlaceholder:
+        dtype = Any
+    torch = _TorchPlaceholder()
 
 from ..node import TorchTrainableNode, TorchState, TorchTimestep, TorchTimeseries, to_tensor
 from .engine import AutognosisEngine, AutognosisConfig

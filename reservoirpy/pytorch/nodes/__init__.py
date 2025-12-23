@@ -44,28 +44,15 @@ Recurrent neural network variants:
 
 from .aten import (
     ATenNode,
-    ATenMatmulNode,
-    ATenAddNode,
-    ATenMulNode,
-    ATenTanhNode,
-    ATenSigmoidNode,
-    ATenSoftmaxNode,
-    ATenLayerNormNode,
-    ATenDropoutNode,
-    ATenConcatNode,
-    ATenSplitNode,
-    ATenReshapeNode,
+    ATenOp,
+    ATenChain,
 )
 
 from .nn_layers import (
     NNLinearNode,
-    NNConv1dNode,
-    NNConv2dNode,
-    NNBatchNormNode,
+    NNConvNode,
     NNLayerNormNode,
-    NNDropoutNode,
     NNAttentionNode,
-    NNEmbeddingNode,
 )
 
 from .rnn import (
@@ -78,26 +65,13 @@ from .rnn import (
 __all__ = [
     # ATen nodes
     "ATenNode",
-    "ATenMatmulNode",
-    "ATenAddNode",
-    "ATenMulNode",
-    "ATenTanhNode",
-    "ATenSigmoidNode",
-    "ATenSoftmaxNode",
-    "ATenLayerNormNode",
-    "ATenDropoutNode",
-    "ATenConcatNode",
-    "ATenSplitNode",
-    "ATenReshapeNode",
+    "ATenOp",
+    "ATenChain",
     # NN nodes
     "NNLinearNode",
-    "NNConv1dNode",
-    "NNConv2dNode",
-    "NNBatchNormNode",
+    "NNConvNode",
     "NNLayerNormNode",
-    "NNDropoutNode",
     "NNAttentionNode",
-    "NNEmbeddingNode",
     # RNN nodes
     "RNNNode",
     "LSTMNode",

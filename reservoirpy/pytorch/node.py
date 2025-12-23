@@ -38,6 +38,10 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     Tensor = Any
+    # Create placeholder for type hints when torch not available
+    class _TorchPlaceholder:
+        dtype = Any
+    torch = _TorchPlaceholder()
 
 from ..node import Node, TrainableNode, OnlineNode, ParallelNode
 from ..type import NodeInput, State, Timeseries, Timestep

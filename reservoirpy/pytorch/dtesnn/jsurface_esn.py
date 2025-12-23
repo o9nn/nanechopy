@@ -46,7 +46,9 @@ try:
 except ImportError:
     TORCH_AVAILABLE = False
     Tensor = Any
-    torch = None
+    class _TorchPlaceholder:
+        dtype = Any
+    torch = _TorchPlaceholder()
     nn = None
 
 try:
